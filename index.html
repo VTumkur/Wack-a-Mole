@@ -1,0 +1,303 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Wack-a-mole</title>
+        <style>
+            *{
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body, html{
+                height: 100%;
+                font-family: serif;
+                font-size: 20px;
+            }
+
+            .container{
+                max-width: 600px;
+                width: 80%;
+                margin: 0 auto;
+                background: brown;
+            }
+
+            .grid > div{
+                display: flex;
+                justify-content: space-around;
+                align-items: flex-start;
+            }
+
+            img{
+                max-width: 100%;
+                width: 100%;
+                height: auto;
+            }
+
+            .square{
+                width: 23%; 
+                position: relative; 
+            }
+
+            .hole{
+                position: absolute;
+                left: 0;
+                bottom: 0.2em;
+            }
+
+            .title-header, .title-timer, .title-score, .no_of_moles{
+                padding: 0.1em;
+                font-family: cursive;
+                letter-spacing: 0.1px;
+                word-spacing:0.3px;
+                text-align: center;
+                margin-bottom: 0.1em;
+
+            }
+
+            .timer, .score, .moles {
+                padding: 0.2em, 0.3em;
+                background: #fff;
+                border-radius: 50%;
+            }
+
+            .control-container {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-top: 0.5em;
+            }
+
+            button {
+                padding: 0.5em 1.3em;
+                margin: 0.2em;
+                font-size: 1rem;
+                border-radius: 310px;
+                border: 0;
+                outline: none;
+                color: #fff;
+            }
+
+            .play {
+                background: #000;
+            }
+
+            .reset {
+                background: red;
+            }
+
+            button:hover {
+                color: yellow;
+            }
+
+            .mole {
+                transform: scale(1,0);   /* we made the moles disappear */
+            }
+
+            .mole-active {
+                transform: scale(1,1);
+                transform-origin: bottom;
+                transition: transform .5s linear;
+            }
+        </style>
+    </head>
+    <body>
+        
+        <div class="container">
+
+            <h1 class="title-header">FIND THE MOLE</h1>
+
+            <h2 class="title-timer">Timer: <span class="timer">30</span></h2>
+
+            <h2 class="title-score">Score: <span class="score">0</span></h2>
+
+            <h2 class="no_of_moles">Moles: <span class="moles_number">0</span></h2>
+
+            <div class="grid">
+
+                <div class="row">
+
+                    <div class="square">
+
+                        <img src="images/mole.png" class="mole" id="1"/>
+                        <img src="images/hole.png" class="hole"/>
+
+                    </div>
+
+                    <div class="square">
+
+                        <img src="images/mole.png" class="mole" id="2"/>
+                        <img src="images/hole.png" class="hole"/>
+
+                    </div>
+
+                    <div class="square">
+
+                        <img src="images/mole.png" class="mole" id="3"/>
+                        <img src="images/hole.png" class="hole"/>
+
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="square">
+
+                        <img src="images/mole.png" class="mole" id="4"/>
+                        <img src="images/hole.png" class="hole"/>
+
+                    </div>
+
+                    <div class="square">
+
+                        <img src="images/mole.png" class="mole" id="5"/>
+                        <img src="images/hole.png" class="hole"/>
+
+                    </div>
+
+                    <div class="square">
+
+                        <img src="images/mole.png" class="mole" id="6"/>
+                        <img src="images/hole.png" class="hole"/>
+
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="square">
+
+                        <img src="images/mole.png" class="mole" id="7"/>
+                        <img src="images/hole.png" class="hole"/>
+
+                    </div>
+
+                    <div class="square">
+
+                        <img src="images/mole.png" class="mole" id="8"/>
+                        <img src="images/hole.png" class="hole"/>
+
+                    </div>
+
+                    <div class="square">
+
+                        <img src="images/mole.png" class="mole" id="9"/>
+                        <img src="images/hole.png" class="hole"/>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="control-container">
+                <button class="play"> Start </button>
+                <button class="reset">Reset</button>
+            </div>
+
+        </div>
+
+
+        <script>
+
+            //selecting all mole images
+            let moles = document.querySelectorAll(".mole");
+
+            //selecting score field
+            let ScoreContainer = document.querySelector(".score");
+
+            //selecting timer field
+            let TimerContainer = document.querySelector(".timer");
+            let counter = TimerContainer.textContent;
+
+            //selecting number of moles field
+            let NoOfMolesContainer = document.querySelector(".moles_number");
+            console.log(NoOfMolesContainer);
+            
+            //converting nodelist into an array
+            let moleArr = Array.prototype.slice.call(moles);
+
+            let random;
+
+            let hitPosition;
+
+            let score = 0;
+
+            //creating variable to count number of moles that appears
+            let moleCount = 0;
+
+            function renderGame() {
+                //removing mole-active class from all the moles
+                moleArr.forEach(curr=>{
+                    curr.classList.remove("mole-active");
+                });
+
+                //creating random number to show the mole
+                random = Math.floor(Math.random() * moleArr.length);
+                moleArr[random].classList.add("mole-active");
+                hitPosition = moleArr[random].id;
+
+                moleCount++;
+
+                NoOfMolesContainer.textContent = moleCount;
+            }
+
+
+            //checking score of the game
+            function renderScore() {
+                //seleecting all the moles
+                moleArr.forEach(curr=>{
+                    curr.addEventListener("click", function(){ 
+                        
+                            if(hitPosition == curr.id) {
+                                //we will add the scores now
+                                score++;
+
+                                ScoreContainer.textContent = score;
+                            }
+                        
+                    })
+                })
+            }
+
+            renderScore();
+
+
+            //render timer
+            let interval;
+
+            function renderTimer() {
+                if(counter > 0) {
+                    counter--;
+                    TimerContainer.textContent = counter;
+                }
+                else {
+                    clearInterval(interval);
+                    moleArr[random].classList.remove("mole-acitve");
+
+                }
+            }
+
+            //update function
+            function update() {
+
+                renderGame();
+                renderTimer();
+            }
+
+            //adding controls
+            document.querySelector(".play").addEventListener("click", function() {
+
+                if(!interval) {
+                   interval =  setInterval(update, 1000);
+                }
+            })
+
+            document.querySelector(".reset").addEventListener("click", function() {
+                location.reload();
+            });
+        </script>
+    </body>
+</html>
